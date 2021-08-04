@@ -9,9 +9,9 @@
         <viewModels:MainViewModel/>
     </ContentPage.BindingContext>
 
-    <Grid>
-        <StackLayout VerticalOptions="Center" 
-				  IsVisible="{Binding IsNotLoggedIn}"
+    <StackLayout>
+        <StackLayout  
+				  
 		  Margin="32">
             <Label Text="Please Login"
 				HorizontalOptions="Center" />
@@ -20,7 +20,7 @@
 				TextColor="White" 
 				Command="{Binding ExecuteLogin}" />
         </StackLayout>
-        <StackLayout IsVisible="{Binding IsLoggedIn}" 
+        <StackLayout  
                      Spacing="12"
                      Margin="0,32">
             <Label Text="Logged in 🙂" 
@@ -56,6 +56,6 @@
                     TextColor="White"
                     Command="{Binding ExecuteLogout}" />
         </StackLayout>
-    </Grid>
-
+    </StackLayout>
+    
 </ContentPage>

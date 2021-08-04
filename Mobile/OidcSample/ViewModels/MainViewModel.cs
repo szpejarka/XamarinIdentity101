@@ -15,14 +15,14 @@ namespace OidcSample.ViewModels
 {
     public class MainViewModel : INotifyPropertyChanged
     {
+        
         private readonly HttpClient _httpClient = new HttpClient();
-        private const string AuthorityUrl = "https://xamarinoidc-app.azurewebsites.net";
         private Credentials? _credentials;
         private readonly OidcIdentityService _oidcIdentityService;
 
         public MainViewModel()
         {
-            _oidcIdentityService = new OidcIdentityService("gnabbermobileclient", App.CallbackScheme, App.SignoutCallbackScheme, "openid profile offline_access", AuthorityUrl);
+            _oidcIdentityService = new OidcIdentityService(App.ClientId, App.CallbackScheme, App.SignoutCallbackScheme, App.Scope, App.AuthorityUrl);
             ExecuteLogin = new Command(Login);
             ExecuteRefresh = new Command(RefreshTokens);
             ExecuteLogout = new Command(Logout);
@@ -54,7 +54,7 @@ namespace OidcSample.ViewModels
 
         private async void GetInfo()
         {
-            var url = Path.Combine(AuthorityUrl, "manage", "index");
+            var url = Path.Combine(App.AuthorityUrl, "manage", "index");
             var response = await _httpClient.GetAsync(url);
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
@@ -75,8 +75,10 @@ namespace OidcSample.ViewModels
 
         private async void Login()
         {
+            //await _oidcIdentityService.Logout(_credentials?.IdentityToken);
             Credentials credentials = await _oidcIdentityService.Authenticate();
             UpdateCredentials(credentials);
+            //await _oidcIdentityService.Logout(_credentials?.IdentityToken);
 
             _httpClient.DefaultRequestHeaders.Authorization = credentials.IsError
                 ? null
@@ -93,7 +95,7 @@ namespace OidcSample.ViewModels
         private async void Logout()
         {
             await _oidcIdentityService.Logout(_credentials?.IdentityToken);
-            _credentials = null;
+            //_credentials = null;
             OnPropertyChanged(nameof(TokenExpirationText));
             OnPropertyChanged(nameof(AccessTokenText));
             OnPropertyChanged(nameof(IdTokenText));
