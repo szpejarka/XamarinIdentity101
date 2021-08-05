@@ -42,7 +42,7 @@ namespace OidcSample.Services
         public async Task<LogoutResult> Logout(string? identityToken)
         {
                 OidcClient oidcClient = CreateOidcClient();
-                LogoutResult logoutResult = await oidcClient.LogoutAsync(new LogoutRequest{IdTokenHint = identityToken});
+                LogoutResult logoutResult = await oidcClient.LogoutAsync(new LogoutRequest{IdTokenHint = identityToken, BrowserDisplayMode = IdentityModel.OidcClient.Browser.DisplayMode.Hidden, BrowserTimeout = 0});
                 return logoutResult;
         }
 

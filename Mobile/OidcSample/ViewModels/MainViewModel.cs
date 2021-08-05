@@ -75,10 +75,11 @@ namespace OidcSample.ViewModels
 
         private async void Login()
         {
-            //await _oidcIdentityService.Logout(_credentials?.IdentityToken);
             Credentials credentials = await _oidcIdentityService.Authenticate();
             UpdateCredentials(credentials);
-            //await _oidcIdentityService.Logout(_credentials?.IdentityToken);
+
+            //if(!credentials.IsError)
+            //    _oidcIdentityService.Logout(credentials.IdentityToken);
 
             _httpClient.DefaultRequestHeaders.Authorization = credentials.IsError
                 ? null
