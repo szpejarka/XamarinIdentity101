@@ -14,12 +14,12 @@ namespace OidcSample
         //public const string ClientId = "gnabbermobileclient";
         //public const string Scope = "openid profile offline_access";
 
-        public const string CallbackUri = "ssg-agility-mobile";
-        public static readonly string CallbackScheme = $"{CallbackUri}://callback";
-        public static readonly string SignoutCallbackScheme = $"{CallbackUri}://signout-callback-oidc";
-        public const string AuthorityUrl = "https://ssgidentity.azurewebsites.net";
-        public const string ClientId = "ssg-agility-engineer";
-        public const string Scope = "openid profile email ssg-agility-api offline_access";
+        public const string CallbackUri = "ssg-agility-engineer";
+        public static string CallbackScheme = $"{CallbackUri}://signin-callback";
+        public static string SignoutCallbackScheme = $"{CallbackUri}://signout-callback";
+        public static string AuthorityUrl = "https://ssgidentity.azurewebsites.net";
+        public static string ClientId = "ssg-agility-engineer-jacek";
+        public static string Scope = "openid profile email ssg-agility-api offline_access";
         public App()
         {
             InitializeComponent();

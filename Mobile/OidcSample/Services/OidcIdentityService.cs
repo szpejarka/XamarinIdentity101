@@ -26,17 +26,9 @@ namespace OidcSample.Services
         
         public async Task<Credentials> Authenticate()
         {
-            try
-            {
-                OidcClient oidcClient = CreateOidcClient();
-                LoginResult loginResult = await oidcClient.LoginAsync(new LoginRequest());
-                return loginResult.ToCredentials();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                return new Credentials {Error = ex.ToString()};
-            }
+            OidcClient oidcClient = CreateOidcClient();
+            LoginResult loginResult = await oidcClient.LoginAsync(new LoginRequest());
+            return loginResult.ToCredentials();
         }
 
         public async Task<LogoutResult> Logout(string? identityToken)

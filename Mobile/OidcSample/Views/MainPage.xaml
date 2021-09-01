@@ -9,10 +9,16 @@
         <viewModels:MainViewModel/>
     </ContentPage.BindingContext>
 
-    <StackLayout>
+    <ScrollView>
+        <StackLayout >
         <StackLayout  
-				  
-		  Margin="32">
+            Margin="32">
+            <Entry Placeholder="Authority Url" Text="{Binding AuthorityUrl}"/>
+            <Entry Placeholder="Client Id" Text="{Binding ClientId}"/>
+            <Entry Placeholder="Redirect Url" Text="{Binding LoginRedirectUrl}"/>
+            <Entry Placeholder="Post Logout Redirect Url" Text="{Binding LogoutRedirectUrl}"/>
+            <Entry Placeholder="Scopes" Text="{Binding Scopes}"/>
+
             <Label Text="Please Login"
 				HorizontalOptions="Center" />
             <Button Text="Login" 
@@ -56,6 +62,7 @@
                     TextColor="White"
                     Command="{Binding ExecuteLogout}" />
         </StackLayout>
-    </StackLayout>
+        </StackLayout>
+    </ScrollView>
     
 </ContentPage>

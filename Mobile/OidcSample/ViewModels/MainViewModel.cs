@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -18,11 +19,9 @@ namespace OidcSample.ViewModels
         
         private readonly HttpClient _httpClient = new HttpClient();
         private Credentials? _credentials;
-        private readonly OidcIdentityService _oidcIdentityService;
-
+        private OidcIdentityService _oidcIdentityService;
         public MainViewModel()
         {
-            _oidcIdentityService = new OidcIdentityService(App.ClientId, App.CallbackScheme, App.SignoutCallbackScheme, App.Scope, App.AuthorityUrl);
             ExecuteLogin = new Command(Login);
             ExecuteRefresh = new Command(RefreshTokens);
             ExecuteLogout = new Command(Logout);
@@ -38,11 +37,17 @@ namespace OidcSample.ViewModels
         public ICommand ExecuteCopyAccessToken { get; }
         public ICommand ExecuteCopyIdentityToken { get; }
 
-        public string TokenExpirationText => "Access Token expires at: " + _credentials?.AccessTokenExpiration;
-        public string AccessTokenText => "Access Token: " + _credentials?.AccessToken;
-        public string IdTokenText => "Id Token: " + _credentials?.IdentityToken;
-        public bool IsLoggedIn => _credentials != null;
-        public bool IsNotLoggedIn => _credentials == null;
+            public string TokenExpirationText => "Access Token expires at: " + _credentials?.AccessTokenExpiration;
+            public string AccessTokenText => "Access Token: " + _credentials?.AccessToken;
+            public string IdTokenText => "Id Token: " + _credentials?.IdentityToken;
+            public bool IsLoggedIn => _credentials != null;
+            public bool IsNotLoggedIn => _credentials == null;
+
+        public string AuthorityUrl { get; set; } = App.AuthorityUrl;
+        public string ClientId { get; set; } = App.ClientId;
+        public string LoginRedirectUrl { get; set; } = App.CallbackScheme;
+        public string LogoutRedirectUrl { get; set; } = App.SignoutCallbackScheme;
+        public string Scopes { get; set; } = App.Scope;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -75,33 +80,56 @@ namespace OidcSample.ViewModels
 
         private async void Login()
         {
-            Credentials credentials = await _oidcIdentityService.Authenticate();
-            UpdateCredentials(credentials);
+            try
+            {
+                _oidcIdentityService = new OidcIdentityService(ClientId, LoginRedirectUrl, LogoutRedirectUrl, Scopes, AuthorityUrl);
+                Credentials credentials = await _oidcIdentityService.Authenticate();
+                UpdateCredentials(credentials);
 
-            //if(!credentials.IsError)
-            //    _oidcIdentityService.Logout(credentials.IdentityToken);
+                //if(!credentials.IsError)
+                //    _oidcIdentityService.Logout(credentials.IdentityToken);
 
-            _httpClient.DefaultRequestHeaders.Authorization = credentials.IsError
-                ? null
-                : new AuthenticationHeaderValue("bearer", credentials.AccessToken);
+                _httpClient.DefaultRequestHeaders.Authorization = credentials.IsError
+                    ? null
+                    : new AuthenticationHeaderValue("bearer", credentials.AccessToken);
+            }
+            catch(Exception e)
+            {
+                await App.Current.MainPage.DisplayAlert("Error " + e.GetType().Name, e.ToString(),"Bye");
+            }
         }
 
         private async void RefreshTokens()
         {
-            if (_credentials?.RefreshToken == null) return;
-            Credentials credentials = await _oidcIdentityService.RefreshToken(_credentials.RefreshToken);
-            UpdateCredentials(credentials);
+            try
+            {
+                //if (_credentials?.RefreshToken == null) return;
+                Credentials credentials = await _oidcIdentityService.RefreshToken(_credentials.RefreshToken);
+                UpdateCredentials(credentials);
+            }
+            catch (Exception e)
+            {
+                await App.Current.MainPage.DisplayAlert("Error " + e.GetType().Name, e.ToString(),"Bye");
+            }
         }
 
         private async void Logout()
         {
-            await _oidcIdentityService.Logout(_credentials?.IdentityToken);
+            try
+            {
+                await _oidcIdentityService.Logout(_credentials?.IdentityToken);
+                OnPropertyChanged(nameof(TokenExpirationText));
+                OnPropertyChanged(nameof(AccessTokenText));
+                OnPropertyChanged(nameof(IdTokenText));
+                OnPropertyChanged(nameof(IsLoggedIn));
+                OnPropertyChanged(nameof(IsNotLoggedIn));
+            }
+            catch (Exception e)
+            {
+                await App.Current.MainPage.DisplayAlert("Error " + e.GetType().Name, e.ToString(),"Bye");
+            }
+
             //_credentials = null;
-            OnPropertyChanged(nameof(TokenExpirationText));
-            OnPropertyChanged(nameof(AccessTokenText));
-            OnPropertyChanged(nameof(IdTokenText));
-            OnPropertyChanged(nameof(IsLoggedIn));
-            OnPropertyChanged(nameof(IsNotLoggedIn));
         }
 
         private void UpdateCredentials(Credentials credentials)
